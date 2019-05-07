@@ -32,12 +32,10 @@ class couchdb (
         command => "/usr/bin/${::couchdb::params::updater} update ${::couchdb::params::updater_options}",
         timeout => '1200'
     }
-    Exec['packager-update'] -> Package[$::couchdb::params::packages] -> Exec['clone']
-    $::couchdb::params::packages.each |String $pkg|{
-        if !defined(Package[$pkg]) {
-            package { $pkg: ensure => 'installed' }
-        }
-    }
+    Exec['packager-update'] -> Exec['clone']
+    ensure_packages($::couchdb::params::packages, {
+      before => Exec['clone']
+    })
     $couchdb_group = $manage_group ? {
         true  => $group,
         false => $::couchdb::params::root_group
