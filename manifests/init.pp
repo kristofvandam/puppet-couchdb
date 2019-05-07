@@ -23,17 +23,16 @@ class couchdb (
     $couchdb_src_dir    = $::couchdb::params::src_dir
 ) inherits ::couchdb::params{
     Class['couchdb'] -> Couchdb::Instance <| |> -> Couchdb::Db <| |>
-    if !defined(Package['curl']) {
-        package { 'curl':
-            ensure => installed,
-        }
-    }
+    ensure_packages(['curl'], {
+      ensure => installed,
+    })
     exec { 'packager-update':
         command => "/usr/bin/${::couchdb::params::updater} update ${::couchdb::params::updater_options}",
         timeout => '1200'
     }
     Exec['packager-update'] -> Exec['clone']
     ensure_packages($::couchdb::params::packages, {
+      ensure => installed,
       before => Exec['clone']
     })
     $couchdb_group = $manage_group ? {
