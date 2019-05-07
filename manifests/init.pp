@@ -20,7 +20,8 @@ class couchdb (
     $manage_group       = true,
     $user               = $::couchdb::params::user,
     $group              = $::couchdb::params::group,
-    $couchdb_src_dir    = $::couchdb::params::src_dir
+    $couchdb_src_dir    = $::couchdb::params::src_dir,
+    $packages           = $::couchdb::params::packages
 ) inherits ::couchdb::params{
     Class['couchdb'] -> Couchdb::Instance <| |> -> Couchdb::Db <| |>
     ensure_packages(['curl'], {
@@ -31,7 +32,7 @@ class couchdb (
         timeout => '1200'
     }
     Exec['packager-update'] -> Exec['clone']
-    ensure_packages($::couchdb::params::packages, {
+    ensure_packages($packages, {
       ensure => installed,
       before => Exec['clone']
     })
